@@ -3,6 +3,8 @@ A captivating and innovative 3D representation of the Mandelbrot set
 
 # 3D Mandelbrot Set Projection
 
+!["3D Mandelbrot Set Project Screengrap"](./images/Screenshot-1.png)
+
 ## Introduction
 I have created a captivating and innovative 3D representation of the Mandelbrot set, a famous mathematical fractal. By projecting the intricate details of the Mandelbrot set into three-dimensional space, I have unlocked a new perspective on this fascinating mathematical object. The resulting visualization is not only visually stunning but also provides a unique perspective on the complex structure and beauty hidden within the Mandelbrot set.
 
