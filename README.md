@@ -26,15 +26,14 @@ The 3D projection of the Mandelbrot set is achieved through a combination of mat
    - A brightness boosting technique is applied to enhance the visibility of the fine details near the plane. This is done by calculating the luminance of each color and applying a nonlinear transformation to the colors below a certain brightness threshold.
 
 3. **Depth calculation:**
-   - The depth values for each point are calculated based on their color difference from the escape point.
-   - In the Mandelbrot set, the escape point is typically defined as the point at which the iteration diverges or "escapes" the set. In this implementation, a point is considered to have escaped the set if its absolute value exceeds a certain escape radius (default is 2).
-   - The depth is calculated by measuring the Euclidean distance between each point's color and the color associated with the escape point in the RGB color space.
+   - The depth values for each point are calculated based on their color difference from black (0, 0, 0).
+   - The depth is calculated by measuring the Euclidean distance between each point's color and black in the RGB color space.
    - Mathematically, the depth calculation can be expressed as:
      ```
-     depth = 1.0 - sqrt((r_point - r_escape)^2 + (g_point - g_escape)^2 + (b_point - b_escape)^2) / sqrt(3)
+     depth = (1.0 - sqrt((r_point - 0)^2 + (g_point - 0)^2 + (b_point - 0)^2) / sqrt(3)) * depth_scale
      ```
-     where `r_point`, `g_point`, `b_point` are the red, green, and blue color components of each point, and `r_escape`, `g_escape`, `b_escape` are the color components associated with the escape point.
-   - The depth is then scaled logarithmically using the `zoom_level` parameter to emphasize the details and create a sense of depth in the 3D projection.
+     where `r_point`, `g_point`, `b_point` are the red, green, and blue color components of each point, and `depth_scale` is a scaling factor based on the `zoom_level`.
+   - The depth is then scaled using the `depth_scale` to create a sense of depth in the 3D projection.
 
 4. **Adaptive point sampling:**
    - To optimize the rendering performance and highlight the interesting regions of the Mandelbrot set, adaptive point sampling is employed.
