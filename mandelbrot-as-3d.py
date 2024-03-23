@@ -7,17 +7,38 @@ from vtk import vtkOctreePointLocator
 # Set the boundaries of the complex plane
 x_min, x_max = -2.0, 1.0
 y_min, y_max = -1.5, 1.5
-width, height = 3000, 3000  # Resolution of the image - 20000, 20000 was used to create the screen graps
-max_iterations = 500  # Maximum number of iterations
-zoom_level = 100000.0;
-escape_radius = 2; # shouldn't need to change
 
-def mandelbrot(h, w, max_iter, escape_radius):
-    x = np.linspace(x_min, x_max, w).reshape((1, w))
-    y = np.linspace(y_min, y_max, h).reshape((h, 1))
-    c = x + 1j * y
-    z = np.zeros((h, w), dtype=np.complex128)
-    iterations = np.zeros((h, w), dtype=int)
+# Other position levels
+#x_min, x_max = -1.0, 0.5
+#y_min, y_max = -0.75, 0.75
+
+#x_min, x_max = -0.3+0.2, 0.45+0.2
+#y_min, y_max = -0.375, 0.375
+
+#x_min, x_max = (-0.3+0.2)/2+0.2, (0.45+0.2)/2+0.2
+#y_min, y_max = -0.375/2, 0.375/2
+
+#x_min, x_max = ((-0.3+0.2)/2+0.2)/2+0.1, ((0.45+0.2)/2+0.2)/2+0.1
+#y_min, y_max = -0.375/2/2, 0.375/2/2
+
+#x_min, x_max = (((-0.3+0.2)/2+0.2)/2+0.1)/2+0.15, (((0.45+0.2)/2+0.2)/2+0.1)/2+0.15
+#y_min, y_max = -0.375/2/2/2, 0.375/2/2/2
+
+#x_min, x_max = ((((-0.3+0.2)/2+0.2)/2+0.1)/2+0.12)/2+0.15, ((((0.45+0.2)/2+0.2)/2+0.1)/2+0.12)/2+0.15
+#y_min, y_max = -0.375/2/2/2/2, 0.375/2/2/2/2
+
+width, height = 2000, 2000  # Resolution of the image - 20000, 20000 was used to create the screen graps
+max_iterations = 1000  # Maximum number of iterations
+zoom_level = 100000000.0;
+escape_radius = 2; # shouldn't need to change
+threshold = 1  # Adjust the threshold value based on your preference - Typically 2 or 1
+
+def mandelbrot(x_min, x_max, y_min, y_max, width, height, max_iter, escape_radius):
+    x = np.linspace(x_min, x_max, width)
+    y = np.linspace(y_min, y_max, height)
+    c = x[:, np.newaxis] + 1j * y[np.newaxis, :]
+    z = np.zeros_like(c, dtype=np.complex128)
+    iterations = np.zeros((height, width), dtype=int)
     
     for i in range(max_iter):
         z = z ** 2 + c
@@ -82,10 +103,15 @@ def generate_3d_points(iterations, depth, threshold, zoom_level):
     return points
 
 
-def render_point_cloud(points, colors):
+
+def render_point_cloud(points, colors, iterations, threshold):
     cloud = pv.PolyData(points)
-    colors_flat = colors.reshape(-1, 3)
-    cloud['colors'] = colors_flat[adaptive_sampling(iterations, threshold).flatten()]
+    
+    # Apply adaptive sampling to colors
+    colors_sampled = colors[adaptive_sampling(iterations, threshold)]
+    colors_flat = colors_sampled.reshape(-1, 3)
+    
+    cloud['colors'] = colors_flat
 
     # Create an octree for level-of-detail rendering
     octree = vtkOctreePointLocator()
@@ -102,10 +128,9 @@ def render_point_cloud(points, colors):
 
 
 # Main program
-iterations = mandelbrot(height, width, max_iterations, escape_radius)
+iterations = mandelbrot(x_min, x_max, y_min, y_max, width, height, max_iterations, escape_radius)
 colors = colorize(iterations, max_iterations)
 depth = calculate_depth(colors, zoom_level=zoom_level)
 
-threshold = 2  # Adjust the threshold value based on your preference
 points = generate_3d_points(iterations, depth, threshold, zoom_level)
-render_point_cloud(points, colors)
+render_point_cloud(points, colors, iterations, threshold)
